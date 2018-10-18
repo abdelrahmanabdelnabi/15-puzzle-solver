@@ -6,7 +6,10 @@
  */
 (function(){
 	var currentStep = 0;
-	var steps = []
+	var steps = [];
+
+	var rows = 3;
+	var cols = 3;
 
 	var state = 1;
 	var puzzle = document.getElementById('puzzle');
@@ -37,8 +40,8 @@
 
 		var sequence = []
 
-		for(var i = 0; i < 4; i++) {
-			for(var j = 0; j < 4; j++) {
+		for(var i = 0; i < rows; i++) {
+			for(var j = 0; j < cols; j++) {
 				var cell = getCell(i, j);
 				var num = cell.innerHTML == '' ? 0 : parseInt(cell.innerHTML)
 				sequence.push(num)
@@ -46,11 +49,15 @@
 		}
 		console.log(sequence)
 
+		select = document.getElementsByName('search strategy')[0]
+
 		const xmlHttp = new XMLHttpRequest();
 		const url='http://localhost:5000/solve';
 		xmlHttp.open("POST", url);
 		xmlHttp.setRequestHeader("Content-Type", "application/json");
-		xmlHttp.send(JSON.stringify({"sequence":sequence}));
+		xmlHttp.send(JSON.stringify(
+			{"sequence":sequence,
+			"strategy": select.options[select.selectedIndex].value}));
 
 		xmlHttp.onreadystatechange=(e)=>{
 			if(xmlHttp.readyState == 4) {
@@ -84,14 +91,14 @@
 		puzzle.innerHTML = '';
 		
 		var n = 1;
-		for(var i = 0; i <= 3; i++){
-			for(var j = 0; j <= 3; j++){
+		for(var i = 0; i < rows; i++){
+			for(var j = 0; j < cols; j++){
 				var cell = document.createElement('span');
 				cell.id = 'cell-'+i+'-'+j;
 				cell.style.left = (j*80+1*j+1)+'px';
 				cell.style.top = (i*80+1*i+1)+'px';
 						
-				if(n <= 15){
+				if(n <= rows * cols - 1){
 					cell.classList.add('number');
 					cell.classList.add((i%2==0 && j%2>0 || i%2>0 && j%2==0) ? 'dark' : 'light');
 					cell.innerHTML = (n++).toString();
@@ -104,6 +111,12 @@
 				puzzle.appendChild(cell);
 			}
 		}
+
+		p = document.getElementById('puzzle');
+		p.style.width = (rows * 80 + 5) + 'px';
+		p.style.height = (cols * 80 + 5) + 'px';
+
+
 	}
 
 	function transitionEndEventName () {
@@ -240,9 +253,9 @@
 		var adjacent = [];
 		
 		// Gets all possible adjacent cells
-		if(row < 3){adjacent.push(getCell(row+1, col));}			
+		if(row < rows - 1){adjacent.push(getCell(row+1, col));}			
 		if(row > 0){adjacent.push(getCell(row-1, col));}
-		if(col < 3){adjacent.push(getCell(row, col+1));}
+		if(col < cols - 1){adjacent.push(getCell(row, col+1));}
 		if(col > 0){adjacent.push(getCell(row, col-1));}
 		
 		return adjacent;
@@ -256,7 +269,7 @@
 	function checkOrder(){
 		
 		// Checks if the empty cell is in correct position
-		if(getCell(3, 3).className != 'empty'){
+		if(getCell(rows - 1, cols - 1).className != 'empty'){
 			return;
 		}
 	
@@ -313,6 +326,8 @@
 				state = 1;
 			}
 		}, 5);
+
+		puzzle.className += " animate";
 
 	}
 	
