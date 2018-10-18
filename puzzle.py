@@ -72,11 +72,12 @@ class Problem:
 		return self.goal_state.equals(state)
 
 class Node:
-	def __init__(self, state, parent, action):
+	def __init__(self, state, parent, action, path_cost):
 		self.state = state
 		self.children = dict()
 		self.parent = parent
 		self.action = action
+		self.path_cost = path_cost
 
 	def add_child(self, child_node, action):
 		self.children[action] = child_node
@@ -92,7 +93,7 @@ class BFS:
 		self.problem = problem
 
 	def search(self):
-		node = Node(self.problem.initial_state, None, '')
+		node = Node(self.problem.initial_state, None, '', 0)
 
 		if self.problem.goal_test(node.state):
 			return node, "success"
@@ -118,11 +119,11 @@ class BFS:
 
 				if child.state not in explored_set and not child.state in frontier_set:
 					if self.problem.goal_test(child.state):
-						return child, "success"
+						return child, "success", len(explored_set)
 
 					frontier_list.append(child)
 					frontier_set.add(child)
 
 	def child_node(self, problem, node, action):
 		next_state = problem.next_state(node.state, action)
-		return Node(next_state, node, action)
+		return Node(next_state, node, action, node.path_cost + 1)

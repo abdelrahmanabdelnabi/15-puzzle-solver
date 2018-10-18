@@ -2,6 +2,9 @@
 p{margin: 0; font: 12px/150% Arial; text-align: center; color: #888;}
 p a{color: #888;}
 
+th, tr {
+	text-align: center;
+}
 #controls{text-align: center;}
 #controls button{
 	cursor: pointer;

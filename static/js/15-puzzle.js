@@ -54,11 +54,18 @@
 
 		xmlHttp.onreadystatechange=(e)=>{
 			if(xmlHttp.readyState == 4) {
-				steps = JSON.parse(xmlHttp.responseText)["steps"];
-				console.log(steps)
+				response = JSON.parse(xmlHttp.responseText)
+				steps = response["steps"];
+				console.log(response);
+				var row = document.getElementById("stats-data");
+				row.innerHTML = 
+				`<td>${response['nodes explored']}</td>
+				 <td>${response['running time']}</td>
+				 <td>${response['path cost']}</td>`;
+
 				currentStep = 0;
 				blankCell = getEmptyCell()
-				transitionEndHandler()				
+				transitionEndHandler()
 			}
 		}
 

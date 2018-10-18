@@ -1,6 +1,7 @@
 from flask import Flask, render_template, send_from_directory, request, jsonify
 import numpy
 import json
+import time
 from puzzle import State, Problem, BFS, Node
 
 app = Flask(__name__)      
@@ -27,7 +28,11 @@ def solve():
 	problem = Problem(initial_state, 4, 4)
 	bfs = BFS(problem)
 
-	node, result = bfs.search()
+	start_time = time.time()
+	node, result, num_explored = bfs.search()
+	running_time = round(time.time() - start_time, 5)
+
+	solution_path_cost = node.path_cost
 
 	steps = list()
 
@@ -37,9 +42,16 @@ def solve():
 
 	steps.reverse()
 
-	print steps
-	print jsonify({"steps":steps})
-	return jsonify({"steps":steps})
+	solution = {
+		"steps": steps,
+		"nodes explored": num_explored,
+		"running time": running_time,
+		"path cost": solution_path_cost
+	}
+
+	print solution
+	print jsonify(solution)
+	return jsonify(solution)
 
 if __name__ == '__main__':
   app.run(debug=True)
