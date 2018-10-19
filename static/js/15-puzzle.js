@@ -38,6 +38,11 @@
 	 */
 	function solve(){
 
+		p = document.getElementById('puzzle');
+
+		if(!p.className.includes('animate'))
+			p.className += 'animate';
+
 		var sequence = []
 
 		for(var i = 0; i < rows; i++) {
@@ -326,8 +331,6 @@
 				state = 1;
 			}
 		}, 5);
-
-		puzzle.className += " animate";
 
 	}
 	
