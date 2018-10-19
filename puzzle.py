@@ -17,7 +17,7 @@ class State:
 			result += i * base
 			base *= 10
 
-		return result
+		return int(result)
 
 	def equals(self, other_state):
 		return numpy.array_equal(self.puzzle_matrix, other_state.puzzle_matrix)
@@ -87,13 +87,6 @@ class Node:
 		self.parent = parent
 		self.action = action
 		self.path_cost = path_cost
-
-# def __eq__(self, other):
-#   if isinstance(other, self.__class__):
-#    	return self.state.equals(other.state)
-
-# def __hash__(self):
-# 		return hash(self.state)
 
 	def add_child(self, child_node, action):
 		self.children[action] = child_node
