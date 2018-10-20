@@ -1,6 +1,7 @@
 import numpy as numpy
 from collections import deque
 from heap import Heap
+from math import sqrt
 
 class State:
 
@@ -11,13 +12,16 @@ class State:
 		return self.equals(other)
 
 	def __hash__(self):
-		result = 1
+		result = 0
 		base = 1
 		for i in numpy.nditer(self.puzzle_matrix):
-			result += i * base
+			result += int(i) * base
 			base *= 10
+			base = min(base, 1e9)
+			result %= 1000000007
 
-		return result
+		#return result
+		return int(result) % 1000000007
 
 	def equals(self, other_state):
 		return numpy.array_equal(self.puzzle_matrix, other_state.puzzle_matrix)
@@ -28,8 +32,7 @@ class Problem:
 		self.initial_state = initial_state
 		self.rows = rows
 		self.cols = cols
-		arr = list(range(1,rows * cols))
-		arr.append(0)
+		arr = list(range(0, rows * cols))
 		self.goal_state = State(numpy.array(arr).reshape(rows, cols))
 
 	def find_blank(self, state):
@@ -75,7 +78,7 @@ class Problem:
 			next_state_matrix[x][y+1] = 0
 			return State(next_state_matrix)
 
-		raise ValueError('unkown action.')
+		raise ValueError('unknown action.')
 
 	def goal_test(self, state):
 		return self.goal_state.equals(state)
@@ -88,12 +91,14 @@ class Node:
 		self.action = action
 		self.path_cost = path_cost
 
-# def __eq__(self, other):
-#   if isinstance(other, self.__class__):
-#    	return self.state.equals(other.state)
+		# def __eq__(self, other):
+		#   if isinstance(other, self.__class__):
+		#    	return self.state.equals(other.state)
 
-# def __hash__(self):
-# 		return hash(self.state)
+		# def __hash__(self):
+		# 		return hash(self.state)
+	def __lt__(self, other):
+		return self.path_cost < other.path_cost
 
 	def add_child(self, child_node, action):
 		self.children[action] = child_node
@@ -119,14 +124,14 @@ class Solver:
 		explored_set = set()
 
 		frontier_list.append(node)
-		frontier_set.add(node)
+		frontier_set.add(node.state)
 
 		while True:
 			if not frontier_list:
-				return node, "failure"
+				return node, "failure", len(explored_set)
 
 			node = frontier_list.popleft()
-			frontier_set.remove(node)
+			frontier_set.remove(node.state)
 
 			explored_set.add(node.state)
 
@@ -138,7 +143,7 @@ class Solver:
 						return child, "success", len(explored_set)
 
 					frontier_list.append(child)
-					frontier_set.add(child)
+					frontier_set.add(child.state)
 
 	def DFS(self):
 		node = Node(self.problem.initial_state, None, '', 0)
@@ -172,7 +177,7 @@ class Solver:
 					frontier_list.append(child)
 					frontier_set.add(child.state)
 
-	def AStar(self):
+	def AStar(self, distance_type):
 		node = Node(self.problem.initial_state, None, '', 0)
 
 		if self.problem.goal_test(node.state):
@@ -198,43 +203,67 @@ class Solver:
 			explored_set.add(node.state)
 
 			for action in self.problem.actions(node.state):
-				child = self.child_node_manhattan(self.problem, node, action)
+				# child = self.child_node_manhattan(self.problem, node, action)
+				child = self.child_node(self.problem, node, action)
 
 				if child.state not in explored_set and child.state not in frontier_set:
-					frontier_heap.add(child, priority=child.path_cost)
-					frontier_set[child.state] = child.path_cost
+					# frontier_heap.add(child, priority=child.path_cost)
+					child_path_to_goal = distance(child.state, distance_type)
+					child_total_path = child.path_cost + child_path_to_goal
+
+					frontier_heap.add(child, priority=child_total_path)
+					frontier_set[child.state] = child_total_path
 				elif child.state in frontier_set:
 					prev_cost = frontier_set[child.state]
 
-					if prev_cost > child.path_cost:
-						frontier_heap.decrease_key(child, child.path_cost)
+					child_path_to_goal = distance(child.state, distance_type)
+					child_total_path = child.path_cost + child_path_to_goal
+
+					# if prev_cost > child.path_cost:
+					if prev_cost > child_total_path:
+						# frontier_heap.decrease_key(child, child.path_cost)
+						frontier_heap.decrease_key(child, child_total_path)
 
 	def child_node(self, problem, node, action):
 		next_state = problem.next_state(node.state, action)
 		return Node(next_state, node, action, node.path_cost + 1)
 
-	def child_node_manhattan(self, problem, node, action):
-		next_state = problem.next_state(node.state, action)
-		return Node(next_state, node, action, node.path_cost + manhattan_distance(next_state))
-
-def manhattan_distance(state):
+def distance(state, type):
 	matrix = state.puzzle_matrix
 	result = 0
 
-	rows = matrix.shape[0]	
+	rows = matrix.shape[0]
 	cols = matrix.shape[1]
 
 	for i in range(rows):
 		for j in range(cols):
 			val = matrix[i][j]
-			if val == 0:
-				expected_col = cols
-				expected_row = rows
-			else:
-				expected_row = (val - 1) // cols
-				expected_col = (val - 1) % cols
-			
-			result += abs(expected_row - i) + abs(expected_col - j)
-	
+			if val != 0:
+				expected_row = val // cols
+				expected_col = val % cols
+
+				if type == 1:
+					result += abs(expected_row - i) + abs(expected_col - j)
+				elif type == 2:
+					result += sqrt(pow((expected_row - i), 2) + pow((expected_col - j), 2))
+
 	return result
 
+'''
+def manhattan_distance(state):
+	matrix = state.puzzle_matrix
+	result = 0
+
+	rows = matrix.shape[0]
+	cols = matrix.shape[1]
+
+	for i in range(rows):
+		for j in range(cols):
+			val = matrix[i][j]
+			if val != 0:
+				expected_row = val // cols
+				expected_col = val % cols
+				result += abs(expected_row - i) + abs(expected_col - j)
+
+	return result
+'''

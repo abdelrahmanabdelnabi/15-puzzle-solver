@@ -6,8 +6,8 @@ import math
 
 from puzzle import State, Problem, Solver, Node
 
-app = Flask(__name__)      
- 
+app = Flask(__name__)
+
 @app.route('/')
 def home():
   return send_from_directory('templates', 'index.html')
@@ -22,7 +22,7 @@ def send_js(path):
 
 @app.route('/solve', methods=['POST'])
 def solve():
-	print request.get_json()
+	print(request.get_json())
 	data = request.get_json()
 	sequence = data['sequence']
 	strategy = data['strategy']
@@ -34,14 +34,14 @@ def solve():
 	solver = Solver(problem)
 
 	start_time = time.time()
-	
+
 	if strategy == 'A* Manhattan Distance':
-		node, result, num_explored = solver.AStar()
+		node, result, num_explored = solver.AStar(1)
 	elif strategy == 'A* - Euclidean Distance':
-		node, result, num_explored = solver.BFS()
+		node, result, num_explored = solver.AStar(2)
 	elif strategy == 'BFS':
 		node, result, num_explored = solver.BFS()
-	elif strategy == 'DFS':	
+	elif strategy == 'DFS':
 		node, result, num_explored = solver.DFS()
 
 	running_time = round(time.time() - start_time, 5)
@@ -63,14 +63,14 @@ def solve():
 		"path cost": len(steps)
 	}
 
-	print solution
-	print jsonify(solution)
+	print(solution)
+	print(jsonify(solution))
 	return jsonify(solution)
 
 
 def is_square(integer):
     root = math.sqrt(integer)
-    if int(root + 0.5) ** 2 == integer: 
+    if int(root + 0.5) ** 2 == integer:
         return True
     else:
         return False
