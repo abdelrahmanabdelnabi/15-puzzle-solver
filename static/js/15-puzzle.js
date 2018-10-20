@@ -16,7 +16,7 @@
 	puzzle.className = 'animate';
 	// Creates solved puzzle
 	initGame();
-	
+
 	var blankCell = getEmptyCell();
 
 	// Listens for click on puzzle cells
@@ -27,16 +27,22 @@
 			shiftCell(e.target);
 		}
 	});
-	
+
 	// Listens for click on control buttons
 	document.getElementById('solve').addEventListener('click', solve);
 	document.getElementById('scramble').addEventListener('click', scramble);
+	document.getElementById('enter').addEventListener('click', generate);
 
 	/**
 	 * Creates solved puzzle
 	 *
 	 */
 	function solve(){
+
+		p = document.getElementById('puzzle');
+
+		if(!p.className.includes('animate'))
+			p.className += 'animate';
 
 		var sequence = []
 
@@ -65,7 +71,7 @@
 				steps = response["steps"];
 				console.log(response);
 				var row = document.getElementById("stats-data");
-				row.innerHTML = 
+				row.innerHTML =
 				`<td>${response['nodes explored']}</td>
 				 <td>${response['running time']}</td>
 				 <td>${response['path cost']}</td>`;
@@ -89,7 +95,7 @@
 
 	function initGame() {
 		puzzle.innerHTML = '';
-		
+
 		var n = 1;
 		for(var i = 0; i < rows; i++){
 			for(var j = 0; j < cols; j++){
@@ -97,7 +103,7 @@
 				cell.id = 'cell-'+i+'-'+j;
 				cell.style.left = (j*80+1*j+1)+'px';
 				cell.style.top = (i*80+1*i+1)+'px';
-						
+
 				if(n <= rows * cols - 1){
 					cell.classList.add('number');
 					cell.classList.add((i%2==0 && j%2>0 || i%2>0 && j%2==0) ? 'dark' : 'light');
@@ -105,9 +111,9 @@
 				} else {
 					cell.className = 'empty';
 					var transitionEnd = transitionEndEventName();
-					cell.addEventListener(transitionEnd, transitionEndHandler, false);		
+					cell.addEventListener(transitionEnd, transitionEndHandler, false);
 				}
-				
+
 				puzzle.appendChild(cell);
 			}
 		}
@@ -136,38 +142,38 @@
 	        }
 	    }
 
-	    //TODO: throw 'TransitionEnd event is not supported in this browser'; 
+	    //TODO: throw 'TransitionEnd event is not supported in this browser';
 	}
 
 	/**
 	 * Shifts number cell to the empty cell
-	 * 
+	 *
 	 */
 	function shiftCell(cell){
-		
+
 		// Checks if selected cell has number
 		if(cell.clasName != 'empty'){
-			
+
 			// Tries to get empty adjacent cell
 			var emptyCell = getEmptyAdjacentCell(cell);
-			
+
 			if(emptyCell){
 				// Temporary data
 				var tmp = {style: cell.style.cssText, id: cell.id};
-				
+
 				// Exchanges id and style values
 				cell.style.cssText = emptyCell.style.cssText;
 				cell.id = emptyCell.id;
 				emptyCell.style.cssText = tmp.style;
 				emptyCell.id = tmp.id;
-				
+
 				if(state == 1){
 					// Checks the order of numbers
 					checkOrder();
 				}
 			}
 		}
-		
+
 	}
 
 	function getCellGivenDicection(cell, dicrection) {
@@ -188,11 +194,11 @@
 
 	function swapCells(cellOne, cellTwo) {
 		var tmp = {style: cellOne.style.cssText, id: cellOne.id};
-				
+
 		// Exchanges id and style values
 		cellOne.style.cssText = cellTwo.style.cssText;
 		cellOne.id = cellTwo.id;
-		
+
 		cellTwo.style.cssText = tmp.style;
 		cellTwo.id = tmp.id;
 	}
@@ -202,9 +208,9 @@
 	 *
 	 */
 	function getCell(row, col){
-	
+
 		return document.getElementById('cell-'+row+'-'+col);
-		
+
 	}
 
 	/**
@@ -212,30 +218,30 @@
 	 *
 	 */
 	function getEmptyCell(){
-	
+
 		return puzzle.querySelector('.empty');
-			
+
 	}
-	
+
 	/**
 	 * Gets empty adjacent cell if it exists
 	 *
 	 */
 	function getEmptyAdjacentCell(cell){
-		
+
 		// Gets all adjacent cells
 		var adjacent = getAdjacentCells(cell);
-		
+
 		// Searches for empty cell
 		for(var i = 0; i < adjacent.length; i++){
 			if(adjacent[i].className == 'empty'){
 				return adjacent[i];
 			}
 		}
-		
+
 		// Empty adjacent cell was not found
 		return false;
-		
+
 	}
 
 	/**
@@ -243,36 +249,36 @@
 	 *
 	 */
 	function getAdjacentCells(cell){
-		
+
 		var id = cell.id.split('-');
-		
+
 		// Gets cell position indexes
 		var row = parseInt(id[1]);
 		var col = parseInt(id[2]);
-		
+
 		var adjacent = [];
-		
+
 		// Gets all possible adjacent cells
-		if(row < rows - 1){adjacent.push(getCell(row+1, col));}			
+		if(row < rows - 1){adjacent.push(getCell(row+1, col));}
 		if(row > 0){adjacent.push(getCell(row-1, col));}
 		if(col < cols - 1){adjacent.push(getCell(row, col+1));}
 		if(col > 0){adjacent.push(getCell(row, col-1));}
-		
+
 		return adjacent;
-		
+
 	}
-	
+
 	/**
 	 * Chechs if the order of numbers is correct
 	 *
 	 */
 	function checkOrder(){
-		
+
 		// Checks if the empty cell is in correct position
 		if(getCell(rows - 1, cols - 1).className != 'empty'){
 			return;
 		}
-	
+
 		var n = 1;
 		// Goes through all cells and checks numbers
 		for(var i = 0; i <= 3; i++){
@@ -284,12 +290,12 @@
 				n++;
 			}
 		}
-		
+
 		// Puzzle is solved, offers to scramble it
 		if(confirm('Congrats, You did it! \nScramble the puzzle?')){
 			scramble();
 		}
-	
+
 	}
 
 	/**
@@ -297,14 +303,14 @@
 	 *
 	 */
 	function scramble(){
-	
+
 		if(state == 0){
 			return;
 		}
-		
+
 		puzzle.removeAttribute('class');
 		state = 0;
-		
+
 		var previousCell;
 		var i = 1;
 		var interval = setInterval(function(){
@@ -327,10 +333,8 @@
 			}
 		}, 5);
 
-		puzzle.className += " animate";
-
 	}
-	
+
 	/**
 	 * Generates random number
 	 *
@@ -338,6 +342,48 @@
 	function rand(from, to){
 
 		return Math.floor(Math.random() * (to - from + 1)) + from;
+
+	}
+
+	function generate() {
+
+		var numbers = document.getElementById('numbers').value.split(" ");
+
+		if (numbers.length == 0) {
+			return;
+		}
+
+		rows = cols = Math.sqrt(numbers.length);
+
+		console.log(rows);
+
+		puzzle.innerHTML = '';
+
+		for(var i = 0; i < rows; i++){
+			for(var j = 0; j < cols; j++){
+				n = numbers[cols * i + j];
+				var cell = document.createElement('span');
+				cell.id = 'cell-'+i+'-'+j;
+				cell.style.left = (j*80+1*j+1)+'px';
+				cell.style.top = (i*80+1*i+1)+'px';
+
+				if(n != 0){
+					cell.classList.add('number');
+					cell.classList.add((i%2==0 && j%2>0 || i%2>0 && j%2==0) ? 'dark' : 'light');
+					cell.innerHTML = (n).toString();
+				} else {
+					cell.className = 'empty';
+					var transitionEnd = transitionEndEventName();
+					cell.addEventListener(transitionEnd, transitionEndHandler, false);
+				}
+
+				puzzle.appendChild(cell);
+			}
+		}
+
+		p = document.getElementById('puzzle');
+		p.style.width = (rows * 80 + 5) + 'px';
+		p.style.height = (cols * 80 + 5) + 'px';
 
 	}
 
