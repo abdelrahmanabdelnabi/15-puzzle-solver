@@ -91,12 +91,6 @@ class Node:
 		self.action = action
 		self.path_cost = path_cost
 
-		# def __eq__(self, other):
-		#   if isinstance(other, self.__class__):
-		#    	return self.state.equals(other.state)
-
-		# def __hash__(self):
-		# 		return hash(self.state)
 	def __lt__(self, other):
 		return self.path_cost < other.path_cost
 
@@ -248,22 +242,3 @@ def distance(state, type):
 					result += sqrt(pow((expected_row - i), 2) + pow((expected_col - j), 2))
 
 	return result
-
-'''
-def manhattan_distance(state):
-	matrix = state.puzzle_matrix
-	result = 0
-
-	rows = matrix.shape[0]
-	cols = matrix.shape[1]
-
-	for i in range(rows):
-		for j in range(cols):
-			val = matrix[i][j]
-			if val != 0:
-				expected_row = val // cols
-				expected_col = val % cols
-				result += abs(expected_row - i) + abs(expected_col - j)
-
-	return result
-'''
