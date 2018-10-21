@@ -37,23 +37,13 @@ def solve():
 	start_time = time.time()
 
 	if strategy == 'A* Manhattan Distance':
-		node, result, num_explored = solver.AStar(1)
+		result, num_explored, steps, running_time = solver.AStar(1)
 	elif strategy == 'A* - Euclidean Distance':
-		node, result, num_explored = solver.AStar(2)
+		result, num_explored, steps, running_time = solver.AStar(2)
 	elif strategy == 'BFS':
-		node, result, num_explored = solver.BFS()
+		result, num_explored, steps, running_time = solver.BFS()
 	elif strategy == 'DFS':
-		node, result, num_explored = solver.DFS()
-
-	running_time = round(time.time() - start_time, 5)
-	steps = list()
-
-	if result == 'success':
-		while node.parent != None:
-			steps.append(node.action)
-			node = node.parent
-
-		steps.reverse()
+		result, num_explored, steps, running_time = solver.DFS()
 
 	solution = {
 		"steps": steps,

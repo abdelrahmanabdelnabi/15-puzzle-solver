@@ -2,6 +2,7 @@ from puzzle import Problem, Node, State
 from heap import Heap
 from math import sqrt
 from frontier import QueueFrontier, StackFrontier
+import time
 
 class Solver:
 
@@ -35,12 +36,15 @@ class Solver:
 					frontier.insert(child)
 
 	def BFS(self):
-		return self._graph_search(QueueFrontier())
+		return self._search(lambda: self._graph_search(QueueFrontier()))
 
 	def DFS(self):
-		return self._graph_search(StackFrontier())
+		return self._search(lambda: self._graph_search(StackFrontier()))
 
 	def AStar(self, distance_type):
+		return self._search(lambda: self._AStar(distance_type))
+
+	def _AStar(self, distance_type):
 		node = Node(self.problem.initial_state, None, '', 0)
 
 		if self.problem.goal_test(node.state):
@@ -90,6 +94,21 @@ class Solver:
 	def child_node(self, problem, node, action):
 		next_state = problem.next_state(node.state, action)
 		return Node(next_state, node, action, node.path_cost + 1)
+
+	def _search(self, agent):
+		start_time = time.time()
+		node, result, num_explored = agent()
+		running_time = round(time.time() - start_time, 5)
+
+		steps = list()
+		if result == 'success':
+			while node.parent != None:
+				steps.append(node.action)
+				node = node.parent
+
+			steps.reverse()
+
+		return result, num_explored, steps, running_time
 
 def distance(state, type):
 	matrix = state.puzzle_matrix
