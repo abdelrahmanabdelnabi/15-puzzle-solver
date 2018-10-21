@@ -4,7 +4,8 @@ import json
 import time
 import math
 
-from puzzle import State, Problem, Solver, Node
+from puzzle import State, Problem, Node
+from solver import Solver
 
 app = Flask(__name__)
 
