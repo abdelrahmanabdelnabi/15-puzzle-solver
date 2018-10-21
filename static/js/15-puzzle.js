@@ -76,15 +76,17 @@
 
 				if(response['status'] == 'failure') {
 					row.innerHTML =
-				`<td>${response['nodes explored']}</td>
+				`<td>${response['strategy']}</td>	
+				 <td>${response['nodes explored']}</td>
 				 <td>${response['running time']}</td>
 				 <td>No solution found</td>`;
 				} else {
 					row.innerHTML =
-					`<td>${response['nodes explored']}</td>
-					 <td>${response['running time']}</td>
-					 <td>${response['path cost']}</td>`;
-					 currentStep = 0;
+					`<td>${response['strategy']}</td>	
+					<td>${response['nodes explored']}</td>
+					<td>${response['running time']}</td>
+					<td>${response['path cost']}</td>`;
+					currentStep = 0;
 					blankCell = getEmptyCell()
 					transitionEndHandler()
 				}
