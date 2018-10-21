@@ -1,7 +1,6 @@
 from flask import Flask, render_template, send_from_directory, request, jsonify
 import numpy
 import json
-import time
 import math
 
 from puzzle import State, Problem, Node
@@ -26,15 +25,17 @@ def solve():
 	print(request.get_json())
 	data = request.get_json()
 	sequence = data['sequence']
-	strategy = data['strategy']
-	if is_square(len(sequence)):
-		sqrt = int(math.sqrt(len(sequence)))
-		np_array = numpy.array(sequence).reshape(sqrt,sqrt)
+
+	if not is_square(len(sequence)):
+		return jsonify({"result": "sequence is not of perfect square length"})
+
+	sqrt = int(math.sqrt(len(sequence)))
+	np_array = numpy.array(sequence).reshape(sqrt,sqrt)
 	initial_state = State(np_array)
 	problem = Problem(initial_state, sqrt, sqrt)
 	solver = Solver(problem)
 
-	start_time = time.time()
+	strategy = data['strategy']
 
 	if strategy == 'A* Manhattan Distance':
 		result, num_explored, steps, running_time = solver.AStar(1)
@@ -54,10 +55,8 @@ def solve():
 		"strategy": strategy
 	}
 
-	print(solution)
 	print(jsonify(solution))
 	return jsonify(solution)
-
 
 def is_square(integer):
     root = math.sqrt(integer)
