@@ -70,15 +70,27 @@
 				response = JSON.parse(xmlHttp.responseText)
 				steps = response["steps"];
 				console.log(response);
-				var row = document.getElementById("stats-data");
-				row.innerHTML =
+				var table = document.getElementById('stats-table');
+
+				var row = table.insertRow();
+
+				if(response['status'] == 'failure') {
+					row.innerHTML =
 				`<td>${response['nodes explored']}</td>
 				 <td>${response['running time']}</td>
-				 <td>${response['path cost']}</td>`;
+				 <td>No solution found</td>`;
+				} else {
+					row.innerHTML =
+					`<td>${response['nodes explored']}</td>
+					 <td>${response['running time']}</td>
+					 <td>${response['path cost']}</td>`;
+					 currentStep = 0;
+					blankCell = getEmptyCell()
+					transitionEndHandler()
+				}
 
-				currentStep = 0;
-				blankCell = getEmptyCell()
-				transitionEndHandler()
+				 console.log(response["status"]);
+
 			}
 		}
 

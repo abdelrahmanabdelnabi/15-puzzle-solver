@@ -45,22 +45,22 @@ def solve():
 		node, result, num_explored = solver.DFS()
 
 	running_time = round(time.time() - start_time, 5)
-
-	solution_path_cost = node.path_cost
-
 	steps = list()
 
-	while node.parent != None:
-		steps.append(node.action)
-		node = node.parent
+	if result == 'success':
+		while node.parent != None:
+			steps.append(node.action)
+			node = node.parent
 
-	steps.reverse()
+		steps.reverse()
 
 	solution = {
 		"steps": steps,
 		"nodes explored": num_explored,
 		"running time": running_time,
-		"path cost": len(steps)
+		"path cost": len(steps),
+		"status": result,
+		"strategy": strategy
 	}
 
 	print(solution)
