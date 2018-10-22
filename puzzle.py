@@ -5,11 +5,6 @@ class State:
 
 	def __init__(self, puzzle_matrix):
 		self.puzzle_matrix = puzzle_matrix
-
-	def __eq__(self, other):
-		return self.equals(other)
-
-	def __hash__(self):
 		result = 0
 		base = 1
 		for i in numpy.nditer(self.puzzle_matrix):
@@ -17,9 +12,13 @@ class State:
 			base *= 10
 			base = min(base, 1e9)
 			result %= 1000000007
+		self._hash = int(result) % 1000000007
 
-		#return result
-		return int(result) % 1000000007
+	def __eq__(self, other):
+		return self.equals(other)
+
+	def __hash__(self):
+		return self._hash
 
 	def equals(self, other_state):
 		return numpy.array_equal(self.puzzle_matrix, other_state.puzzle_matrix)
