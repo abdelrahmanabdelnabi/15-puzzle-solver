@@ -110,7 +110,7 @@
 	function initGame() {
 		puzzle.innerHTML = '';
 
-		var n = 1;
+		var n = 0;
 		for(var i = 0; i < rows; i++){
 			for(var j = 0; j < cols; j++){
 				var cell = document.createElement('span');
@@ -118,7 +118,7 @@
 				cell.style.left = (j*80+1*j+1)+'px';
 				cell.style.top = (i*80+1*i+1)+'px';
 
-				if(n <= rows * cols - 1){
+				if(n > 0){
 					cell.classList.add('number');
 					cell.classList.add((i%2==0 && j%2>0 || i%2>0 && j%2==0) ? 'dark' : 'light');
 					cell.innerHTML = (n++).toString();
@@ -126,6 +126,7 @@
 					cell.className = 'empty';
 					var transitionEnd = transitionEndEventName();
 					cell.addEventListener(transitionEnd, transitionEndHandler, false);
+					n++;
 				}
 
 				puzzle.appendChild(cell);

@@ -13,3 +13,14 @@ TODO:
 - refactor the heap frontier implementation.
 
 The frontend code was adopted from [Arnis Ritiņ](https://github.com/arnisritins/15-Puzzle) and modified to fit the solver.
+
+## Demo
+
+![alt text](https://github.com/abdelrahmanabdelnabi/15-puzzle-solver/raw/master/demo.gif "Demo")
+
+## Running
+
+- install numpy and flask python packages installed for python 2.
+- cd into the project directory
+- run `python routes.py`
+- go to localhost:5000 in your browser, you will see the frontpage
